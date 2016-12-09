@@ -14,6 +14,9 @@ angular.module('smartapp').controller('inicioCtrl', ['$state', '$http', '$scope'
     $scope.luminosidad = function(){
     	$state.go('luz');
     }
+    $scope.coap = function(){
+        $state.go('coap');
+    }
     $scope.exit = function(){
     	$state.go('login');
     }

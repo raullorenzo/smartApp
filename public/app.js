@@ -27,6 +27,11 @@ smartapp.config(function ($stateProvider, $urlRouterProvider) {
             templateUrl: '../vistas/luz/luz.html',
             controller: 'luzCtrl'
         })
+        .state('coap', {
+            url: '/coap',
+            templateUrl: '../vistas/coap/arduino-chat-frontend-logo.html',
+            controller: 'coapCtrl'
+        })
         .state('temp', {
             url: '/temp',
             templateUrl: '../vistas/temp/temp.html',
