@@ -29,7 +29,7 @@ smartapp.config(function ($stateProvider, $urlRouterProvider) {
         })
         .state('coap', {
             url: '/coap',
-            templateUrl: '../vistas/coap/arduino-chat-frontend-logo.html',
+            templateUrl: '../vistas/coap/coap.html',
             controller: 'coapCtrl'
         })
         .state('temp', {

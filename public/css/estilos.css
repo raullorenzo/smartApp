@@ -69,6 +69,34 @@ body {
     bottom:0px; 
     z-index:0;
 }
+/*chariot content*/
+#content { 
+  padding:5px; 
+  background:#ddd; 
+  border-radius:5px; 
+  overflow-y: scroll; 
+  display:flex; 
+  flex-direction:column-reverse;
+  border:1px solid #CCC; 
+  margin-top:10px; 
+  height: 500px; 
+}
+
+#input { 
+  border-radius:2px; 
+  border:1px solid #ccc;
+  margin-top:10px; 
+  padding:5px; 
+  width:600px;  
+}
+
+#status { 
+  width:88px; 
+  display:block; 
+  float:left; 
+  margin-top:15px; 
+}
+/*end chariot content*/
 
 #msg-container2{
     position: relative;
