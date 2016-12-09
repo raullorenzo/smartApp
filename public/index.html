@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="smartapp">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SmartApp</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script> -->
+    <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/normalize.css">
+    <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/main.css">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="bower_components/ng-table/dist/ng-table.css">
+
+    <link rel="stylesheet" href="css/core.css">
+    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/c3.css">
+
+    <link href="bower_components/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="bower_components/sweetalert/dist/sweetalert.css">
+    
+
+</head>
+<body>
+    
+    <section ui-view></section>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="bower_components/ng-table/dist/ng-table.js"></script>
+    <script src="bower_components/ng-file-upload/ng-file-upload.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="bower_components/angular-sweetalert/SweetAlert.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-file-model/angular-file-model.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+
+    <script src="components/version/version.js"></script>
+    <script src="components/version/version-directive.js"></script>
+    <script src="components/version/interpolate-filter.js"></script>
+    <!-- <script src="servicios/flash.service.js"></script> -->
+    <script src="app.js"></script>
+    <script src="vistas/dist/distCtrl.js"></script>
+    <script src="vistas/inicio/inicioCtrl.js"></script>
+    <script src="vistas/temp/tempCtrl.js"></script>
+    <script src="vistas/luz/luzCtrl.js"></script>
+    <script src="vistas/login/loginCtrl.js"></script>
+    <script src="js/c3.js"></script>
+    <script src="js/d3.js"></script>
+</body>
+</html>
