@@ -46,7 +46,7 @@ mongoose.connect('mongodb://localhost/sensors', function(err, res) {
 //var server = require('http').Server(app);
 
 var serialport = require('serialport');
-var portName = '/dev/cu.wchusbserialfd130';
+var portName = '/dev/cu.wchusbserialfd120';
 //var portName = '/dev/cu.usbmodemFA141';
 var myPort = new serialport(portName, {
     baudRate: 9600,
