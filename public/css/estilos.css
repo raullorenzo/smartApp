@@ -71,15 +71,16 @@ body {
 }
 /*chariot content*/
 #content { 
-  padding:5px; 
-  background:#ddd; 
+  padding:15px; 
+  background:##ffffff; 
   border-radius:5px; 
   overflow-y: scroll; 
   display:flex; 
   flex-direction:column-reverse;
-  border:1px solid #CCC; 
+  border:1px solid red; 
   margin-top:10px; 
-  height: 500px; 
+  /*height: 500px; */
+  max-height: 500px
 }
 
 #input { 

@@ -2,106 +2,216 @@
  * Created by raul on 5/12/16.
  */
 
-//var socket = io ({forceNew: true});
-//var socket = io();
+const CHARIOT = 'coap://chariot.';
+const SOURCE  = 'c352';
+const DEST   = '.local/';
+const SENSOR  = 'sensors/tmp275-c?get';
 
-angular.module('smartapp').controller('coapCtrl', ['$state', '$http', '$scope', '$window', '$cookies', function ($state, $http, $scope, FlashService, $window, $cookies) {
+
+angular.module('smartapp').controller('coapCtrl', function ($state, $stateParams, $http, $scope, $rootScope, $window, $cookies, $interval) {
+    
+    var promise26;
+    var promise27;
+    var promise28;
+    var promise29;
+    var count = 0;
+
     $scope.return = function(){
-    	$state.go('inicio');
+    	// $state.transitionTo('inicio');
+        $state.go('inicio');
     }
     $scope.exit = function(){
     	$state.go('login');
     }
+    $scope.reload = function(){
+        // $state.forceReload('coap');
+        $interval.cancel(promise26);
+        promise26 = undefined;
+        $interval.cancel(promise27);
+        promise27 = undefined;
+        $interval.cancel(promise28);
+        promise28 = undefined;
+        $interval.cancel(promise29);
+        promise29 = undefined;
+        $state.transitionTo($state.current, $stateParams, {
+            reload: true,
+            inherit: false,
+            notify: true
+        });
+    }
 
-    var content = $('#content');
-    var input = $('#input');
-    var status = $('#status');
-
-    // my color assigned by the server
-    var myColor = true;
-    // my name sent to the server
-    var myName = true;
 	
     // if user is running mozilla then use it's built-in WebSocket
     window.WebSocket = window.WebSocket || window.MozWebSocket;
-	
+
     // if browser doesn't support WebSocket, just show some notification and exit
     if (!window.WebSocket) {
-        content.html($('<p>', { text: 'Sorry, but your browser doesn\'t '
-                                    + 'support WebSockets.'} ));
-        input.hide();
-        $('span').hide();
-        return;
+        var status = 'Sorry, but your browser doesn\'t ' + 'support WebSockets.';
+        $scope.status = status;
     }
 
     // open connection--overwrite default string for your value.
-	// var chariot = prompt("Please enter Chariot WS server: ", "ws://192.168.1.115:1337");
-    var chariot = "ws://192.168.1.115:1337";
+    var chariot = "ws://192.168.1.175:1337";
 	var connection = new WebSocket(chariot);
+    console.log(connection);
+
  
     connection.onopen = function () {
+        console.log('Server Status On');
+
         // first we want users to enter their names
-        input.removeAttr('disabled');
-        status.text('Enter cmd/URL ');
+        //input.removeAttr('disabled');
+        var status = 'Server Status On';
+        $scope.$apply(function(){
+            $scope.status = status;
+        });
+        
     };
 
     connection.onerror = function (error) {
         // just in case there were some problems with connection...
-        content.html($('<p>', { text: 'Sorry, but there\'s some problem with your '
-                                    + 'connection or the server is down.' } ));
+        var status = 'Sorry, but there\'s some problem with your ' 
+                   + 'connection or the server is down.';
+        $scope.status = status;
     };
 
     // most important part - incoming messages
     connection.onmessage = function (event) {
-		input.removeAttr('disabled'); // let the user write another message
-		//content.prepend('<p> ' +
-        //     + 'Arduino IoT: ' + event.data + '</p>');
-		content.prepend('<p> ' + event.data + '</p>');
-		//addMessage();
+        var aux = event.data;
+        if (aux.length < 15){
+            console.log(aux);
+            $scope.$apply(function(){
+                $scope.tiempo = ' - Response Time: '+aux;
+            });
+        }else{
+            var location = event.data.substring(0,13);
+            var temp = event.data;
+            result = event.data.substring(35,39);
+            $scope.$apply(function(){
+                $scope.result = result+' ºC';
+                $scope.location = 'Localización: '+location;
+                $scope.contador = ' - Loop: '+i;
+            });
+            console.log('Vuelta número: '+i);
+            console.log(result);
+            console.log(temp);
+        }
     };
 
     /**
-     * Send mesage when user presses Enter key
+     * Send mesage when user presses the buttons
      */
-    input.keydown(function(e) {
-        if (e.keyCode === 13) {
-            var msg = $(this).val();
-            if (!msg) {
-                return;
-            }
-            // send the message as an ordinary text
-			content.prepend('<p> ' + msg + '</p>');
-            connection.send(msg);
-            $(this).val('');
-            // disable the input field to make the user wait until server
-            // sends back response
-            //input.attr('disabled', 'disabled');
 
-            // we know that the first message sent from a user their name
-            //if (myName === false) {
-            //    myName = msg;
-            //}
+    
+    $scope.chariot26 = function(){
+        i = 0;
+        $interval.cancel(promise27);
+        promise27 = undefined;
+        $interval.cancel(promise28);
+        promise28 = undefined;
+        $interval.cancel(promise29);
+        promise29 = undefined;
+
+        repeat26 = function(){
+            var msg = CHARIOT+SOURCE+6+DEST+SENSOR;
+            console.log(msg);
+            connection.send(msg);
+            i++;
         }
-    });
+        repeat26();
+        promise26 = $interval(function() 
+        { 
+            repeat26();
+        }, 
+        10000);
+        console.log(promise26);
+    }
+
+    $scope.chariot27 = function(){
+        i = 0;
+        $interval.cancel(promise26);
+        promise26 = undefined;
+        $interval.cancel(promise28);
+        promise28 = undefined;
+        $interval.cancel(promise29);
+        promise29 = undefined;
+
+        repeat27 = function(){
+            var msg= CHARIOT+SOURCE+7+DEST+SENSOR;
+            console.log(msg);
+            connection.send(msg);
+            i++;
+        }
+        repeat27();
+        promise27 = $interval(function() 
+        { 
+            repeat27();
+        }, 
+        10000);  
+        console.log(promise27);
+    }
+
+    $scope.chariot28 = function(){
+        i = 0;
+        $interval.cancel(promise27);
+        promise27 = undefined;
+        $interval.cancel(promise26);
+        promise26 = undefined;
+        $interval.cancel(promise29);
+        promise29 = undefined;
+
+        repeat28 = function(){
+            var msg= CHARIOT+SOURCE+8+DEST+SENSOR;
+            console.log(msg);
+            connection.send(msg);
+            i++;
+        }
+        repeat28();
+        promise28 = $interval(function() 
+        { 
+            repeat28();
+        }, 
+        10000);
+        console.log(promise28);
+    }
+
+    $scope.chariot29 = function(){
+        i = 0;
+        $interval.cancel(promise27);
+        promise27 = undefined;
+        $interval.cancel(promise28);
+        promise28 = undefined;
+        $interval.cancel(promise26);
+        promise26 = undefined;
+
+        repeat29 = function(){
+            var msg= CHARIOT+SOURCE+9+DEST+SENSOR;
+            console.log(msg);
+            connection.send(msg);
+            i++;
+        }
+        repeat29();
+        promise29 = $interval(function() 
+        { 
+            repeat29();
+        }, 
+        10000);
+        console.log(promise29);
+    }
+
 
     /**
      * This method is optional. If the server wasn't able to respond to the
      * in 30 seconds then show some error message to notify the user that
      * something is wrong. We're talking to an Arduino WoT!
      */
+
     setInterval(function() {
         if (connection.readyState !== 1) {
-            status.text('Error');
-            input.attr('disabled', 'disabled').val('Unable to communicate '
-                                                 + 'with the WebSocket server.');
+            var status = 'Error ' 
+                        + 'Unable to communicate ' 
+                        + 'with the WebSocket server.';
+            $scope.status = status;
         }
     }, 60000);
-
-    /**
-     * Add message to the chat window
-     */
-    function addMessage() {
-        content.prepend('<p> ' +
-             + 'Arduino IoT: ' + message.data + '</p>');
-    }
-}]);
+});
