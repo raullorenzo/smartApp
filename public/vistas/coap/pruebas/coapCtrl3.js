@@ -2,268 +2,268 @@
  * Created by raul on 5/12/16.
  */
 
-//var socket = io ({forceNew: true});
-//var socket = io();
+const CHARIOT = 'coap://chariot.';
+const SOURCE  = 'c352';
+const DEST   = '.local/';
+const SENSOR  = 'sensors/tmp275-c?get';
+
+var intents = 0;
 
 
-// angular.module('smartapp', [
-//       'angular-websocket' // you may also use 'angular-websocket' if you prefer
-//     ])
-//     //                          WebSocket works as well
-//     .factory('MyData', function($websocket) {
-//       // Open a WebSocket connection
-//       var dataStream = $websocket("ws://192.168.1.31:1337");
+angular.module('smartapp').controller('coapCtrl', function ($state, $stateParams, $http, $scope, $rootScope, $window, $cookies, $interval) {
+    
+    var promise26;
+    var promise27;
+    var promise28;
+    var promise29;
+    var count = 0;
+    var status_error = 0;
 
-//       var collection = [];
+    $scope.return = function(){
+        $state.go('inicio');
+    }
+    $scope.exit = function(){
+    	$state.go('login');
+    }
+    $scope.reload = function(){
+        $interval.cancel(promise26);
+        promise26 = undefined;
+        $interval.cancel(promise27);
+        promise27 = undefined;
+        $interval.cancel(promise28);
+        promise28 = undefined;
+        $interval.cancel(promise29);
+        promise29 = undefined;
+        intents++;
+        console.log('Reloads: '+intents);
+        $state.transitionTo($state.current, $stateParams, {
+            reload: true,
+            inherit: false,
+            notify: true
+        });
+    }
 
-//       dataStream.onMessage(function(message) {
-//         collection.push(message.data);
-//       });
-
-//       var methods = {
-//         collection: collection,
-//         chariot26: function() {
-//             var msg = 'coap://chariot.c3526.local/sensors/tmp275-c?get';
-//             dataStream.send(msg);
-//         },
-//         chariot27: function() {
-//             var msg = 'coap://chariot.c3527.local/sensors/tmp275-c?get';
-//             dataStream.send(msg);
-//         },
-//         chariot28: function() {
-//             var msg = 'coap://chariot.c3528.local/sensors/tmp275-c?get';
-//             dataStream.send(msg);
-//         },
-//         chariot29: function() {
-//             var msg = 'coap://chariot.c3529.local/sensors/tmp275-c?get';
-//             dataStream.send(msg);
-//         }
-//       };
-
-//       return methods;
-//     })
-//     .controller('coapCtrl', ['$state', '$http', '$scope', '$window', '$cookies', '$MyData' function ($state, $http, $scope, $window, $cookies, $MyData) {
-//         $scope.return = function(){
-//             $state.go('inicio');
-//         }
-//         $scope.exit = function(){
-//             $state.go('login');
-//         }
-
-//         $scope.MyData = MyData;
-//     }]);
-
-angular.module('smartapp').controller('coapCtrl', ['$state', '$http', '$scope', '$window', '$cookies', function ($state, $http, $scope, FlashService, $window, $cookies, MyData) {
-        $scope.return = function(){
-          $state.go('inicio');
-        }
-        $scope.exit = function(){
-          $state.go('login');
-        }
-        
-      $scope.MyData = MyData;
-
- }]).factory('MyData', function($websocket) {
-      // Open a WebSocket connection
-      var dataStream = $websocket('ws://192.168.1.31:1337');
-
-      var collection = [];
-
-      dataStream.onMessage(function(message) {
-        collection.push(message.data);
-      });
-
-
-      // var methods = {
-      //   collection: collection,
-      //   get: function() {
-      //     dataStream.send(JSON.stringify({ action: 'get' }));
-      //   }
-      // };
-
-      return methods;
-    });
-// angular.module('smartapp').controller('coapCtrl', ['$state', '$http', '$scope', '$window', '$cookies', function ($state, $http, $scope, FlashService, $window, $cookies) {
-//     $scope.return = function(){
-//     	$state.go('inicio');
-//     }
-//     $scope.exit = function(){
-//     	$state.go('login');
-//     }
-
-//     //var content = $('#content');
-//     // var input = $('#input');
-//     // var status = $('#status');
-
-//     // my color assigned by the server
-//     //var myColor = true;
-//     // my name sent to the server
-//     //var myName = true;
 	
-//     // if user is running mozilla then use it's built-in WebSocket
-//     window.WebSocket = window.WebSocket || window.MozWebSocket;
-	
-//     // if browser doesn't support WebSocket, just show some notification and exit
-//     if (!window.WebSocket) {
-//         // content.html($('<p>', { text: 'Sorry, but your browser doesn\'t '
-//         //                             + 'support WebSockets.'} ));
-//         // input.hide();
-//         // $('span').hide();
-//         // return;
+    // if user is running mozilla then use it's built-in WebSocket
+    window.WebSocket = window.WebSocket || window.MozWebSocket;
 
-//         var status = 'Sorry, but your browser doesn\'t ' + 'support WebSockets.';
-//         $scope.status = status;
-//     }
+    // if browser doesn't support WebSocket, just show some notification and exit
+    if (!window.WebSocket) {
+        var status = 'Sorry, but your browser doesn\'t ' + 'support WebSockets.';
+        $scope.$apply(function(){
+            $scope.status = status;
+            $scope.result = 'Push reload button';
+            $scope.location = 'Location: --';
+            $scope.contador = ' Lap number: -- ';
+            $scope.tiempo = ' Response time: --';
+        });  
+    }
 
-//     // open connection--overwrite default string for your value.
-// 	// var chariot = prompt("Please enter Chariot WS server: ", "ws://192.168.1.115:1337");
-//     var chariot = "ws://192.168.1.31:1337";
-// 	var connection = new WebSocket(chariot);
+    // open connection--overwrite default string for your value.
+    var chariot = "ws://192.168.1.175:1337";
+	var connection = new WebSocket(chariot);
+    console.log(connection);
+
  
-//     connection.onopen = function () {
-//         // first we want users to enter their names
-//         //input.removeAttr('disabled');
-//         var status = 'Server On';
-//         $scope.status = status;
-//     };
+    connection.onopen = function () {
+        console.log('Server Status On');
 
-//     connection.onerror = function (error) {
-//         // just in case there were some problems with connection...
-//         // content.html($('<p>', { text: 'Sorry, but there\'s some problem with your '
-//         //                             + 'connection or the server is down.' } ));
-//         var result = 'Sorry, but there\'s some problem with your ' 
-//                     + 'connection or the server is down.';
-//         $scope.result = result;
-//     };
+        // first we want users to enter their names
+        var status = 'Server Status On';
+        $scope.$apply(function(){
+            $scope.status = status;
+            $scope.result = '-------';
+            $scope.location = 'Location: --';
+            $scope.contador = ' Lap number: -- ';
+            $scope.tiempo = ' Response time: --';
+        });
+        
+    };
 
-//     // most important part - incoming messages
-//     connection.onmessage = function (event) {
+    connection.onerror = function (error) {
+        var result_loc2 = 'The socket server is down, please reset the server';
+        // just in case there were some problems with connection...
+        var status = 'Sorry, but there\'s some problem with your ' 
+                   + 'connection or the server is down.';
+        $interval.cancel(promise26);
+        promise26 = undefined;
+        $interval.cancel(promise27);
+        promise27 = undefined;
+        $interval.cancel(promise28);
+        promise28 = undefined;
+        $interval.cancel(promise29);
+        promise29 = undefined;
+        $scope.$apply(function(){
+                if (intents > 5){
+                    $scope.status = status;
+                    $scope.result = result_loc2;
+                    $scope.location = 'Location: --';
+                    $scope.contador = ' Lap number: -- ';
+                    $scope.tiempo = ' Response time: --';
+                    console.log('status error 2');
+                }else{
+                    $scope.status = status;
+                    $scope.result = 'Push reload button';
+                    $scope.location = 'Location: --';
+                    $scope.contador = ' Lap number: -- ';
+                    $scope.tiempo = ' Response time: --';
+                }
+            });  
+    };
 
-// 		//input.removeAttr('disabled'); // let the user write another message
-// 		//content.prepend('<p> ' +
-//         //     + 'Arduino IoT: ' + event.data + '</p>');
-// 		//content.prepend('<p> ' + event.data + '</p>');
-   
-//         // var result = event.data;
-//         // if (event.data == 'chariot.c3526.local: 2.05 CONTENT  25.7(C)'){
-//         //     console.log('OK');
-//         //     var aux = event.data
-//         //     $scope.result = aux;
-//         // }else{
-//         //     console.log('NO OK');
-//         // }
-//         // textoAreaDividido = textoArea.split(" ");
-//         // numeroPalabras = textoAreaDividido.length;
-//         // while (event){
-//         //     var aux = event.data.substring(35,39);
-//         //     var numaux = aux.length;
-//         //     if (numaux == 4){
-//         //         $scope.result = aux;
-//         //     }
-//         //     return;
-//         // }
-//         // var aux = event.data;
-//         // var result;
-//         // if (aux.length < 15){
-//         //     console.log(aux);
-//         // }else{
-//         //     var temp = event.data;
-//         //     result = event.data.substring(35,39);
-//         //     //addMessage(result);
-//         //     $scope.result = result+'ºC';
-//         //     console.log(result);
-//         //     console.log(temp);
-//         // }
-//         $scope.result = event.data;
+    // most important part - incoming messages
+    connection.onmessage = function (event) {
+        var aux = event.data;
+        if (aux.length < 15){
+            console.log(aux);
+            $scope.$apply(function(){
+                $scope.tiempo = ' - Response Time: '+aux;
+            });
+        }else{
+            var location = event.data.substring(0,13);
+            var temp = event.data;
+            result = event.data.substring(35,39);
+            $scope.$apply(function(){
+                $scope.result = result+' ºC';
+                $scope.location = 'Location: '+location;
+                $scope.contador = ' - Loop: '+i;
+            });
+            console.log('Lap number: '+i);
+            console.log(result);
+            console.log(temp);
+        }
+    };
+
+    /**
+     * Send mesage when user presses the buttons
+     */
+
+    
+    $scope.chariot26 = function(){
+        i = 0;
+        $interval.cancel(promise27);
+        promise27 = undefined;
+        $interval.cancel(promise28);
+        promise28 = undefined;
+        $interval.cancel(promise29);
+        promise29 = undefined;
+
+        repeat26 = function(){
+            var msg = CHARIOT+SOURCE+6+DEST+SENSOR;
+            console.log(msg);
+            connection.send(msg);
+            i++;
+        }
+        repeat26();
+        promise26 = $interval(function() 
+        { 
+            repeat26();
+        }, 
+        10000);
+        console.log(promise26);
+    }
+
+    $scope.chariot27 = function(){
+        i = 0;
+        $interval.cancel(promise26);
+        promise26 = undefined;
+        $interval.cancel(promise28);
+        promise28 = undefined;
+        $interval.cancel(promise29);
+        promise29 = undefined;
+
+        repeat27 = function(){
+            var msg= CHARIOT+SOURCE+7+DEST+SENSOR;
+            console.log(msg);
+            connection.send(msg);
+            i++;
+        }
+        repeat27();
+        promise27 = $interval(function() 
+        { 
+            repeat27();
+        }, 
+        10000);  
+        console.log(promise27);
+    }
+
+    $scope.chariot28 = function(){
+        i = 0;
+        $interval.cancel(promise27);
+        promise27 = undefined;
+        $interval.cancel(promise26);
+        promise26 = undefined;
+        $interval.cancel(promise29);
+        promise29 = undefined;
+
+        repeat28 = function(){
+            var msg= CHARIOT+SOURCE+8+DEST+SENSOR;
+            console.log(msg);
+            connection.send(msg);
+            i++;
+        }
+        repeat28();
+        promise28 = $interval(function() 
+        { 
+            repeat28();
+        }, 
+        10000);
+        console.log(promise28);
+    }
+
+    $scope.chariot29 = function(){
+        i = 0;
+        $interval.cancel(promise27);
+        promise27 = undefined;
+        $interval.cancel(promise28);
+        promise28 = undefined;
+        $interval.cancel(promise26);
+        promise26 = undefined;
+
+        repeat29 = function(){
+            var msg= CHARIOT+SOURCE+9+DEST+SENSOR;
+            console.log(msg);
+            connection.send(msg);
+            i++;
+        }
+        repeat29();
+        promise29 = $interval(function() 
+        { 
+            repeat29();
+        }, 
+        10000);
+        console.log(promise29);
+    }
 
 
-//         //$scope.result = result;
-//         console.log($scope.result);
-//         //console.log(result);
-//         // console.log('----------------');
-//          // console.log('$scope: ',$scope.result);
-//         // console.log('----------------');
-//         // console.log('event: '+JSON.stringify(event.data));
-//         // console.log('----------------');
-//         // console.profile();
-//         // console.trace();
-//         //addMessage();
-//         // var result = event.data;
-//         // $scope.result = result;
+    /**
+     * This method is optional. If the server wasn't able to respond to the
+     * in 30 seconds then show some error message to notify the user that
+     * something is wrong. We're talking to an Arduino WoT!
+     */
 
-//         //console.log(result);
-//     };
-
-//     /**
-//      * Send mesage when user presses Enter key
-//      */
-
-//     $scope.chariot26 = function(){
-//         var msg = 'coap://chariot.c3526.local/sensors/tmp275-c?get';
-//         console.log(msg);
-//         connection.send(msg);
-//     }
-
-//     $scope.chariot27 = function(){
-//         var msg= 'coap://chariot.c3527.local/sensors/tmp275-c?get';
-//         console.log(msg);
-//         connection.send(msg);
-//     }
-
-//     $scope.chariot28 = function(){
-//         var msg= 'coap://chariot.c3528.local/sensors/tmp275-c?get';
-//         console.log(msg);
-//         connection.send(msg);
-//     }
-
-//     $scope.chariot29 = function(){
-//         var msg= 'coap://chariot.c3529.local/sensors/tmp275-c?get';
-//         console.log(msg);
-//         connection.send(msg);
-//     }
-//    //  input.keydown(function(e) {
-//    //      if (e.keyCode === 13) {
-//    //          var msg = $(this).val();
-//    //          if (!msg) {
-//    //              return;
-//    //          }
-//    //          // send the message as an ordinary text
-// 			// content.prepend('<p> ' + msg + '</p>');
-//    //          connection.send(msg);
-//    //          $(this).val('');
-//    //          // disable the input field to make the user wait until server
-//    //          // sends back response
-//    //          //input.attr('disabled', 'disabled');
-
-//    //          // we know that the first message sent from a user their name
-//    //          //if (myName === false) {
-//    //          //    myName = msg;
-//    //          //}
-//    //      }
-//    //  });
-
-//     /**
-//      * This method is optional. If the server wasn't able to respond to the
-//      * in 30 seconds then show some error message to notify the user that
-//      * something is wrong. We're talking to an Arduino WoT!
-//      */
-//     setInterval(function() {
-//         if (connection.readyState !== 1) {
-//             // status.text('Error');
-//             // input.attr('disabled', 'disabled').val('Unable to communicate '
-//             //                                      + 'with the WebSocket server.');
-//             var status = 'Error' 
-//                         + 'Unable to communicate ' 
-//                         + 'with the WebSocket server.';
-//             $scope.status = status;
-//         }
-//     }, 60000);
-
-//     /**
-//      * Add message to the chat window
-//      */
-//     // function addMessage() {
-//     //     //content.prepend('<p> ' + event.data + '</p><hr>');
-//     //     //$scope.result =  result+' ºC';
-//     // }
-// }]);
+    setInterval(function() {
+        var result_loc1 = 'The socket server is down, please reset the server';
+        if (connection.readyState !== 1) {
+            var status = 'Error ' 
+                        + 'Unable to communicate ' 
+                        + 'with the WebSocket server.';
+            $scope.$apply(function(){
+                if (intents > 5){
+                    $scope.status = status;
+                    $scope.result = result_loc1;
+                    $scope.location = 'Location: --';
+                    $scope.contador = ' Lap number: -- ';
+                    $scope.tiempo = ' Response time: --';
+                    console.log('status error 1');
+                }else{
+                    $scope.status = status;
+                    $scope.result = 'Push reload button';
+                    $scope.location = 'Location: --';
+                    $scope.contador = ' Lap number: -- ';
+                    $scope.tiempo = ' Response time: --';
+                }
+            });  
+        }
+    }, 60000);
+});

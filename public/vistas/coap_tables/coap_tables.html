@@ -1,0 +1,84 @@
+
+<div style="padding: 5%;" onload="getData()">
+    <br>
+    <br>
+    <h1 style="font-size: 60px;">TEMPERATURE DATES:</h1>
+    <hr>
+    <div class="botones">
+        <button type="button" class="btn btn-success" ng-click="return()"><span class="glyphicon glyphicon-home"></span>&nbsp;&nbsp;VOLVER</button>
+        <!-- <br><br> -->
+        <button type="button" class="btn btn-danger" ng-click="exit()"><span class="glyphicon glyphicon-off"></span>&nbsp;&nbsp;SALIR</button>
+        <!-- <br><br> -->
+        <button style="float: right;" type="button" class="btn btn-primary" ng-click="reload()"><span class="glyphicon glyphicon-refresh"></span></button>
+        <!-- <br><br> -->
+        <!-- <button type="button" class="btn btn-danger" ng-click="mul()">MULTIPLICACIÓN HOMOMÓRFICA</button> -->
+        <!-- <br><br> -->
+        <!-- <button type="button" class="btn btn-primary" ng-click="des_mul()">DESENCRIPTAR MULTIPLICACIÓN</button> -->
+        <!-- <input style="display: none;" type="file" id="files" name="files[]" accept=".RSA" /> -->
+    </div>
+    <br>
+    <br>
+    <hr>
+    <h2>All Chariots Line:</h2><br>
+    <canvas height="85%" id="line" class="chart chart-line" chart-data="data"
+    chart-labels="labels" chart-series="series" chart-options="options"
+    chart-dataset-override="datasetOverride" chart-click="onClick">
+    </canvas>
+    <hr>
+    <h2>Chariot c3526:</h2><br>
+    <canvas height="85%" id="line" class="chart chart-line" chart-data="data2"
+    chart-labels="labels2" chart-series="series2" chart-options="options"
+    chart-dataset-override="datasetOverride" chart-click="onClick">
+    </canvas>
+    <hr>
+    <h2>Chariot c3527:</h2><br>
+    <canvas height="85%" id="line" class="chart chart-line" chart-data="data3"
+    chart-labels="labels3" chart-series="series3" chart-options="options"
+    chart-dataset-override="datasetOverride" chart-click="onClick">
+    </canvas>
+    <hr>
+    <h2>Chariot c3528:</h2><br>
+    <canvas height="85%" id="line" class="chart chart-line" chart-data="data4"
+    chart-labels="labels4" chart-series="series4" chart-options="options"
+    chart-dataset-override="datasetOverride" chart-click="onClick">
+    </canvas>
+    <hr>
+    <h2>Chariot c3529:</h2><br>
+    <canvas height="85%" id="line" class="chart chart-line" chart-data="data5"
+    chart-labels="labels5" chart-series="series5" chart-options="options"
+    chart-dataset-override="datasetOverride" chart-click="onClick">
+    </canvas>
+    <hr>
+    <h2>All Chariots Historygram:</h2><br>
+    <canvas height="85%" id="bar" class="chart chart-bar" chart-data="data" chart-labels="labels" chart-series="series"> 
+    </canvas>
+    <hr>
+  <!--   <canvas id="doughnut" class="chart chart-doughnut" chart-data="data" chart-labels="labels">
+    </canvas> 
+    <hr> -->
+    <br>
+    <br>
+    <table class="table table-hover" ng-table="tableParams" show-filter="true">
+        <tr ng-repeat="temp in $data">
+            <td data-title="'&nbsp;&nbsp;&nbsp;&nbsp;Nº'" >
+                &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: black" class="nocolor" ng-bind="$index+1"></span><br>
+            </td>
+            <td data-title="'&nbsp;&nbsp;&nbsp;&nbsp;Location'" sortable="'location'" filter="{ 'location': 'text' }">
+                &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: green" class="nocolor" ng-bind="temp.location"></span><br>
+            </td>
+            <td data-title="'&nbsp;&nbsp;&nbsp;&nbsp;Temperature'" sortable="'temperature'"
+                filter="{ 'temperature': 'text' }">
+                &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: red" class="nocolor" ng-bind="temp.temperature+' ºC'"></span><br>
+            </td>
+            <td data-title="'&nbsp;&nbsp;&nbsp;&nbsp;Data'" sortable="'created'" filter="{ 'created': 'text' }">
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="nocolor" ng-bind="temp.created | amDateFormat:'DD.MM.YYYY HH:mm:ss'"></span>
+            </td>
+            <td data-title="'&nbsp;&nbsp;&nbsp;&nbsp;Options'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button type="button" class="btn btn-danger" ng-click="delTemp(temp)"><span class="glyphicon glyphicon-trash"></span></button>
+            </td>
+        </tr>
+    </table>
+</div>
+<!-- <div class="alert alert-warning text-center" data-ng-hide="!usuarios.$resolved || usuarios.length">
+    No existen usuarios ahora. Por qué no <a ui-sref="add">creas uno</a>?
+</div> -->

@@ -11,8 +11,8 @@ angular.module('smartapp').controller('inicioCtrl', ['$state', '$http', '$scope'
     $scope.distancia = function(){
     	$state.go('dist');
     }
-    $scope.luminosidad = function(){
-    	$state.go('luz');
+    $scope.tables = function(){
+    	$state.go('coap_tables');
     }
     $scope.coap = function(){
         $state.go('coap');

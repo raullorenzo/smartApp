@@ -1,9 +1,19 @@
 /**
  * Created by raul on 5/12/16.
  */
-// process.env.TZ = 'UTC+2';
+
 var chariot         = 'ws://192.168.0.195:1337';
-var round = 1;
+
+var tiempo;
+var location;
+var resp;
+var result;
+var place;
+
+var c26             = 0;
+var c27             = 0;
+var c28             = 0;
+var c29             = 0;
 
 const MIRE          = 'Mire\'s bedroom';
 const RAUL          = 'Raul\'s bedroom';
@@ -13,7 +23,6 @@ const CHARIOT       = 'coap://chariot.';
 const SOURCE        = 'c352';
 const DEST          = '.local/';
 const SENSOR        = 'sensors/tmp275-c?get';
-const MAX_SENS      = 4;
 
 var app             = require("express")();
 var express         = require("express"),// Express: Framework HTTP para Node.js
@@ -31,14 +40,10 @@ var WebSocketClient = require('websocket').client;
     cookieParser    = require('cookie-parser');
     passport        = require('passport'); // Passport: Middleware de Node que facilita la autenticación de usuarios
     cors            = require('cors');
+//var io              = require('socket.io').listen(server);
     serialport      = require('serialport');
 var sleep           = require('sleep');
-var moment          = require('moment-timezone');
-var events          = require('events');
-// var Temp            = require('./models/temp.js');
-// var io              = require('socket.io').listen(server);
-
-moment().tz("Europe/Madrid").format();
+var Temp            = require('./models/temp.js');
 
 var allowCrossDomain = function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -69,25 +74,12 @@ mongoose.connect('mongodb://localhost/sensors', function(err, res) {
 // var app = express();
 var server = require('http').Server(app);
 
-/** WebSocket Client **/
 function start(){
     var client = new WebSocketClient();
-    // var promise = new (events.EventEmitter);
-
     client.connect(chariot);
      
     client.on('connectFailed', function(error) {
-        console.log('');
-        console.log('______________________________________________________________');
-        console.log('');
         console.log('Connect Error: ' + error.toString());
-        console.log('');
-        console.log('______________________________________________________________');
-        console.log('');
-        console.log('Trying to reconnect WebSocket Client...');
-        console.log('');
-        console.log('______________________________________________________________');
-        console.log('');
         sleep.sleep(5);
         start();
     });
@@ -95,38 +87,7 @@ function start(){
         console.log('______________________________________________________________');
         console.log('');
         console.log('WebSocket Client Connected');
-        console.log('');
-        console.log('______________________________________________________________');
-        function sendTemp(l) {
-            var loc = l;
-            if (connection.connected) {
-                var msg = CHARIOT+SOURCE+loc+DEST+SENSOR;
-                console.log('');
-                console.log('**************************************************************');
-                console.log('');
-                console.log('msg:',msg);
-                console.log('');
-                console.log('**************************************************************');
-                console.log('');
-                connection.sendUTF(msg);
-            }
-        }
-        function clWS(){
-            console.log('');
-            console.log('--------------------------------------------------------------');
-            console.log('');
-            console.log('Closing WebSocketClient...');
-            console.log('');
-            console.log('--------------------------------------------------------------');
-            console.log('');
-            connection.close();
-        }
-        var inc = 6;
-        for (i=0; i<MAX_SENS; i++){
-            sleep.sleep(1);
-            sendTemp(inc);
-            inc++;
-        }
+        //sleep.sleep(5);
         connection.on('error', function(error) {
             console.log("Connection Error: " + error.toString());
         });
@@ -136,69 +97,130 @@ function start(){
             console.log('');
             console.log('WebSocket Client Closed');
             console.log('');
-            console.log('______________________________________________________________');
-            console.log('');
         });
         connection.on('message', function(message) {
-            // promise.emit('success', message);
-            // console.log('');
-            // console.log('==============================================================');
-            // console.log('promise:',promise);
-            // console.log('==============================================================');
-            // console.log('');
-            console.log('');
-            console.log('==============================================================');
-            console.log('round#:',round);
-            console.log('==============================================================');
-            console.log('');
             if (message.type === 'utf8') {
                 console.log('');
                 console.log("Received:",message.utf8Data);
                 var aux = message.utf8Data;
                 console.log('length:',aux.length);
-                if (aux.length<15){
+                if (aux.length < 15){
                     console.log('aux:',aux);
+                    tiempo = aux;
+                    console.log('tiempo:',tiempo);
+                    console.log('location:',location);
                 }else{
-                    var location = message.utf8Data.substring(0,13);
-                    var result = message.utf8Data.substring(35,39);
-                    if (result == '    '){
+                    location = message.utf8Data.substring(0,13);
+                    resp = message.utf8Data;
+                    result = message.utf8Data.substring(35,39);
+                    if(result == '    '){
                         result = 'NOT FOUND';
                         location = 'NOT FOUND';
-                        // AddTemp(location, result);
-                        console.log('');
-                        console.log('/////////////////////////////////////////////////////////////');
-                        console.log('');
-                        console.log('result:',result);
-                        console.log('');
-                        console.log('/////////////////////////////////////////////////////////////');
-                        console.log('');
                     }
-                    else if (location == 'chariot.c3526'){
-                        AddTemp(location, result);
-                        console.log('location1:',location);
+                    if(location == 'chariot.c3526'){
+                        c26 = 1;
+                        console.log('*** c26',c26);
                     }
-                    else if (location == 'chariot.c3527'){
-                        AddTemp(location, result);
-                        console.log('location2:',location);
+                    if(location == 'chariot.c3527'){
+                        c27 = 1;
+                        console.log('*** c27',c27);
                     }
-                    else if (location == 'chariot.c3528'){
-                        AddTemp(location, result);
-                        console.log('location3:',location);
+                    if(location == 'chariot.c3528'){
+                        c28 = 1;
+                        console.log('*** c28',c28);
                     }
-                    else if (location == 'chariot.c3529'){
-                        AddTemp(location, result);
-                        console.log('location4:',location);
-                        connection.close();
-                        //clWS();
+                    if(location == 'chariot.c3529'){
+                        c29 = 1;
+                        console.log('*** c29',c29);
                     }
+                    console.log('result:',result);
+                    console.log('location:',location);
+                    console.log('resp:',resp);
+                    sleep.sleep(1);
+                    AddTemp(location, result);
                 }
+                console.log('');
+                console.log('RESULTADO:',result);
+                console.log('______________________________________________________________');
+                console.log('______________________________________________________________');
+                console.log('');
+                //function close websocket
+                //connection.close();
             }
-            round++;
+            //sleep.sleep(1);
+            closeWS();
         });
+        function closeWS() {
+            if ((c26 == 1)&&(c27 == 1)&&(c28 == 1)&&(c29 == 1)){
+                console.log('Closing WebSocket Client...');
+                c26 = 0;
+                c27 = 0;
+                c28 = 0;
+                c29 = 0;
+                connection.close();
+            }
+        }
+        function sendTemp26() {
+            if (connection.connected) {
+                var msg26 = CHARIOT+SOURCE+6+DEST+SENSOR;
+                console.log('______________________________________________________________');
+                console.log('');
+                console.log('msg26:',msg26);
+                console.log('______________________________________________________________');
+                connection.sendUTF(msg26);
+                // sleep.sleep(1);
+                // setTimeout(sendTemp, 10000);
+            }
+        }
+        function sendTemp27() {
+            if (connection.connected) {
+                var msg27 = CHARIOT+SOURCE+7+DEST+SENSOR;
+                console.log('');
+                console.log('msg27:',msg27);
+                console.log('______________________________________________________________');
+                connection.sendUTF(msg27);
+                // sleep.sleep(1);
+                // setTimeout(sendTemp, 10000);
+            }
+        }
+        function sendTemp28() {
+            if (connection.connected) {
+                var msg28 = CHARIOT+SOURCE+8+DEST+SENSOR;
+                console.log('');
+                console.log('msg28:',msg28);
+                console.log('______________________________________________________________');
+                connection.sendUTF(msg28);
+                // sleep.sleep(1);
+                // setTimeout(sendTemp, 10000);
+            }
+        }
+        function sendTemp29() {
+            if (connection.connected) {
+                var msg29 = CHARIOT+SOURCE+9+DEST+SENSOR;
+                console.log('');
+                console.log('msg29:',msg29);
+                console.log('______________________________________________________________');
+                console.log('');
+                connection.sendUTF(msg29);
+                // sleep.sleep(1);
+                // setTimeout(sendTemp, 10000);
+            }
+        }
+        sendTemp26();
+        sleep.sleep(1);
+        sendTemp27();
+        sleep.sleep(1);
+        sendTemp28();
+        sleep.sleep(1);
+        sendTemp29();
+        sleep.sleep(1);
     });
+    //setTimeout(start, 10000);
 }
+
 start();
-setInterval(start, 150000);
+
+setInterval(start, 600000);
 //setTimeout(start, 10000);
 
 /** End WebSocket Client **/
