@@ -23,21 +23,6 @@ smartapp.controller('coap_tablesCtrl', function ($state, $http, $scope, $locatio
     $scope.demotableParams = new ngTableParams(params, settings);
     function start(){
         $scope.tableParams.reload();
-        var dateNow = new Date().getTime();
-        var loc26 = [];
-        var loc27 = [];
-        var loc28 = [];
-        var loc29 = [];
-        var temp26 = [];
-        var temp27 = [];
-        var temp28 = [];
-        var temp29 = [];
-        var data26 = [];
-        var data27 = [];
-        var data28 = [];
-        var data29 = [];
-        var currentDay = moment(dateNow).calendar();
-        console.log(currentDay);
         moment.updateLocale('es', {
             calendar : {
                 lastDay : '[Ayer a las] LT',
@@ -49,6 +34,21 @@ smartapp.controller('coap_tablesCtrl', function ($state, $http, $scope, $locatio
         });
         $http.get('/temp/GetTemp')
             .success(function (data) {
+                var loc26 = [];
+                var loc27 = [];
+                var loc28 = [];
+                var loc29 = [];
+                var temp26 = [];
+                var temp27 = [];
+                var temp28 = [];
+                var temp29 = [];
+                var data26 = [];
+                var data27 = [];
+                var data28 = [];
+                var data29 = [];
+                var dateNow = new Date().getTime();
+                var currentDay = moment(dateNow).calendar();
+                console.log(currentDay);
                 $scope.temps = data;            
                 for (var i=0; i<data.length; i++){
                     if (data[i].location == 'chariot.c3526'){
@@ -91,7 +91,6 @@ smartapp.controller('coap_tablesCtrl', function ($state, $http, $scope, $locatio
                         console.log('data29',data29.length);
                         return data29;
                     }
-
                 }
                 $scope.labels = dateTemp(data26,data27,data28,data29);
                 $scope.series = [KITCHEN, OFFICE, BATHROOM, BEDROOM];
@@ -191,17 +190,9 @@ smartapp.controller('coap_tablesCtrl', function ($state, $http, $scope, $locatio
             //$window.location.reload();
             start();
         }
-
-        // console.log('***:',$stateParams);
-
     }
     start();
-
     setInterval(start, 20000);
-
-    
-
-    
     // $scope.find = function () {
     //     var temps = {}
     //     return $http.get('/temp/GetTempbyLoc')
