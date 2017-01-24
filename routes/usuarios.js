@@ -61,7 +61,7 @@ module.exports = function (app) {
         });
     };
 
-     //GET - Obtner usuario a partir de el login
+    //GET - Obtner usuario a partir de el login
     ObtenerUsuarioporLog = function (req, res) {
         Usuario.find({login: req.params.login}, function (err, usuario) {
             if (err) return res.send(500, err.message);

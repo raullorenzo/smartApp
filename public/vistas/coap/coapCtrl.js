@@ -1,45 +1,107 @@
 /**
  * Created by raul on 5/12/16.
  */
+'use strict';
+// localStorage.setItem(prefix+this._localKey+wireMessage.messageIdentifier, JSON.stringify(storedMessage));
+// var value = localStorage.getItem(key);
+var chariot         = 'ws://192.168.0.195:1337';
 
-const CHARIOT = 'coap://chariot.';
-const SOURCE  = 'c352';
-const DEST   = '.local/';
-const SENSOR  = 'sensors/tmp275-c?get';
+const CHARIOT       = 'coap://chariot.';
+const SOURCE        = 'c352';
+const DEST          = '.local/';
+const SENSOR        = 'sensors/tmp275-c?get';
+const BATHROOM      = 'Chariot 3528';
+const BEDROOM       = 'Chariot 3529';
+const OFFICE        = 'Chariot 3527';
+const KITCHEN       = 'Chariot 3526';
 
 
-angular.module('smartapp').controller('coapCtrl', function ($state, $stateParams, $http, $scope, $rootScope, $window, $cookies, $interval) {
-    
+smartapp.controller('coapCtrl', function ($state, $stateParams, $http, $scope, $rootScope, $window, $interval, $location) {
     var promise26;
     var promise27;
     var promise28;
     var promise29;
+
+    var dis26 = false;
+    var dis27 = false;
+    var dis28 = false;
+    var dis29 = false;
+
+    var connection = null;
     var count = 0;
+    var i;
+
+    $scope.result   = 'Connecting...';
+    $scope.status   = 'Connecting...';
+    $scope.location = 'Location: **';
+    $scope.contador = ' Lap number: ** ';
+    $scope.tiempo   = ' Response time: **';
+    $scope.place    = 'Place: **';
 
     $scope.return = function(){
-    	// $state.transitionTo('inicio');
+        console.log('function return');
+        promises();
         $state.go('inicio');
     }
     $scope.exit = function(){
+        console.log('function exit');
+        promises();
     	$state.go('login');
     }
     $scope.reload = function(){
-        // $state.forceReload('coap');
-        $interval.cancel(promise26);
-        promise26 = undefined;
-        $interval.cancel(promise27);
-        promise27 = undefined;
-        $interval.cancel(promise28);
-        promise28 = undefined;
-        $interval.cancel(promise29);
-        promise29 = undefined;
-        $state.transitionTo($state.current, $stateParams, {
-            reload: true,
-            inherit: false,
-            notify: true
-        });
+        console.log('function reload');
+        // promises();
+        // $state.transitionTo($state.current, $stateParams, {
+        //     reload: true,
+        //     inherit: false,
+        //     notify: true
+        // });
+        promises();
+        //$location.path('/coap');
+        $window.location.reload();
     }
 
+    $scope.desconnection = function(){
+        promises();
+        connection.close();
+    }
+
+     $scope.stop_reload = function(){
+        promises();
+        console.log('Stop reload');
+    }
+
+    function promises(){
+        console.log('function promises');
+        if (angular.isDefined(promise26)) {
+            $interval.cancel(promise26);
+            promise26 = undefined;
+        }
+        if (angular.isDefined(promise27)) {
+            $interval.cancel(promise27);
+            promise27 = undefined;
+        }
+        if (angular.isDefined(promise28)) {
+            $interval.cancel(promise28);
+            promise28 = undefined;
+        }
+        if (angular.isDefined(promise29)) {
+            $interval.cancel(promise29);
+            promise29 = undefined;
+        }
+        // $interval.cancel(promise26);
+        // promise26 = undefined;
+        // $interval.cancel(promise27);
+        // promise27 = undefined;
+        // $interval.cancel(promise28);
+        // promise28 = undefined;
+        // $interval.cancel(promise29);
+        // promise29 = undefined;
+        console.log('promise26: '+angular.isDefined(promise26));
+        console.log('promise27: '+angular.isDefined(promise27));
+        console.log('promise28: '+angular.isDefined(promise28));
+        console.log('promise29: '+angular.isDefined(promise29));
+    }
 	
     // if user is running mozilla then use it's built-in WebSocket
     window.WebSocket = window.WebSocket || window.MozWebSocket;
@@ -47,74 +109,162 @@ angular.module('smartapp').controller('coapCtrl', function ($state, $stateParams
     // if browser doesn't support WebSocket, just show some notification and exit
     if (!window.WebSocket) {
         var status = 'Sorry, but your browser doesn\'t ' + 'support WebSockets.';
-        $scope.status = status;
-    }
-
-    // open connection--overwrite default string for your value.
-    var chariot = "ws://192.168.1.175:1337";
-	var connection = new WebSocket(chariot);
-    console.log(connection);
-
- 
-    connection.onopen = function () {
-        console.log('Server Status On');
-
-        // first we want users to enter their names
-        //input.removeAttr('disabled');
-        var status = 'Server Status On';
         $scope.$apply(function(){
             $scope.status = status;
-        });
-        
-    };
+            $scope.result = 'Push reload button';
+            $scope.location = 'Location: --';
+            $scope.contador = ' Lap number: -- ';
+            $scope.tiempo = ' Response time: --';
+            $scope.place = ' Place: --';
+            console.log('Error. status error 1');
+        });  
+    }
 
-    connection.onerror = function (error) {
-        // just in case there were some problems with connection...
-        var status = 'Sorry, but there\'s some problem with your ' 
-                   + 'connection or the server is down.';
-        $scope.status = status;
-    };
+	// var connection = new WebSocket(chariot);
+    // console.log(connection);
 
-    // most important part - incoming messages
-    connection.onmessage = function (event) {
-        var aux = event.data;
-        if (aux.length < 15){
-            console.log(aux);
+    // open connection--overwrite default string for your value.
+    function start(){
+        connection = new WebSocket(chariot);
+        connection.onopen = function () {
+            console.log('Server Status On');
+
+            // first we want users to enter their names
+            var status = 'Server Status On';
             $scope.$apply(function(){
-                $scope.tiempo = ' - Response Time: '+aux;
+                $scope.status = status;
+                $scope.result = 'Server Ready!';
+                $scope.location = 'Location: --';
+                $scope.contador = ' Lap number: -- ';
+                $scope.tiempo = ' Response time: --';
+                $scope.place = ' Place: --';
             });
-        }else{
-            var location = event.data.substring(0,13);
-            var temp = event.data;
-            result = event.data.substring(35,39);
-            $scope.$apply(function(){
-                $scope.result = result+' ºC';
-                $scope.location = 'Localización: '+location;
-                $scope.contador = ' - Loop: '+i;
-            });
-            console.log('Vuelta número: '+i);
-            console.log(result);
-            console.log(temp);
-        }
-    };
+            
+        };
+
+        // most important part - incoming messages
+        connection.onmessage = function (event) {
+            var aux = event.data;
+            if (aux.length < 15){
+                console.log(aux);
+                $scope.$apply(function(){
+                    $scope.tiempo = ' - Response Time: '+aux;
+                });
+            }else{
+                var location = event.data.substring(0,13);
+                var temp = event.data;
+                var result = event.data.substring(35,39);
+                $scope.$apply(function(){
+                    if(result == '    '){
+                        $scope.result = 'NOT FOUND';
+                    }else{
+                         $scope.result = result+' ºC';
+                    }
+                    $scope.location = 'Location: '+location;
+                    $scope.contador = ' - Loop: '+i;
+                    if (location == 'chariot.c3527'){
+                        $scope.place = ' - Place: '+OFFICE;
+                    }else if(location == 'chariot.c3528'){
+                        $scope.place = ' - Place: '+BATHROOM;
+                    }else if(location == 'chariot.c3526'){
+                        $scope.place = ' - Place: '+KITCHEN;
+                    }else if(location == 'chariot.c3529'){
+                        $scope.place = ' - Place: '+BEDROOM;
+                    }else{
+                         $scope.place = ' - Place: '+'NOT FOUND';
+                    }
+                });
+                console.log('Lap number: '+i);
+                console.log(result);
+                console.log(temp);
+            }
+        };
+
+        connection.onerror = function(event){
+           
+            // just in case there were some problems with connection...
+            console.log('error type: ',event);
+            promises();
+            check();
+            if (count < 30){
+                var status = 'Sorry, but there\'s some problem with your ' 
+                       + 'connection or the server is down.';
+                $scope.$apply(function(){
+                    $scope.status = status;
+                    $scope.result = 'Trying restart the server...';
+                    $scope.location = 'Location: --';
+                    $scope.contador = ' Lap number: -- ';
+                    $scope.tiempo = ' Response time: --';
+                    $scope.place = ' Place: --';
+                    console.log('Error. status error 2');
+                });
+            }else{
+                var status = 'Sorry, it has impossible restart the server. The server is down';
+                $scope.$apply(function(){
+                    $scope.status = status;
+                    $scope.result = 'Restart server manually';
+                    $scope.location = 'Location: --';
+                    $scope.contador = ' Lap number: -- ';
+                    $scope.tiempo = ' Response time: --';
+                    $scope.place = ' Place: --';
+                    console.log('Error. status error 3');
+                });
+            }
+            console.log('check: ',count);
+            count++;
+        }; 
+
+        connection.onclose = function(){
+
+            //reconnect now
+            promises();
+            console.log('Restarting the server...');
+            check();
+        };
+    }
+
+    function check(){
+        if(!connection || connection.readyState == 3) start();
+    }
+
+    //start();
+    setInterval(check, 5000);
 
     /**
      * Send mesage when user presses the buttons
      */
 
-    
     $scope.chariot26 = function(){
+        promises();
+        dis26 = true;
+        dis27 = false;
+        dis28 = false;
+        dis29 = false;
         i = 0;
-        $interval.cancel(promise27);
-        promise27 = undefined;
-        $interval.cancel(promise28);
-        promise28 = undefined;
-        $interval.cancel(promise29);
-        promise29 = undefined;
+        // if (angular.isDefined(promise27)) {
+        //     $interval.cancel(promise27);
+        //     promise27 = undefined;
+        // }
+        // if (angular.isDefined(promise28)) {
+        //     $interval.cancel(promise28);
+        //     promise28 = undefined;
+        // }
+        // if (angular.isDefined(promise29)) {
+        //     $interval.cancel(promise29);
+        //     promise29 = undefined;
+        // }
+        // $interval.cancel(promise27);
+        // promise27 = undefined;
+        // $interval.cancel(promise28);
+        // promise28 = undefined;
+        // $interval.cancel(promise29);
+        // promise29 = undefined;
 
-        repeat26 = function(){
+        function repeat26(){
             var msg = CHARIOT+SOURCE+6+DEST+SENSOR;
             console.log(msg);
+            console.log('isDefined26: '+angular.isDefined(promise26));
+            console.log('promise26: '+promise26);
             connection.send(msg);
             i++;
         }
@@ -123,22 +273,41 @@ angular.module('smartapp').controller('coapCtrl', function ($state, $stateParams
         { 
             repeat26();
         }, 
-        10000);
+        20000);
         console.log(promise26);
     }
 
     $scope.chariot27 = function(){
+        promises();
+        dis26 = false;
+        dis27 = true;
+        dis28 = false;
+        dis29 = false;
         i = 0;
-        $interval.cancel(promise26);
-        promise26 = undefined;
-        $interval.cancel(promise28);
-        promise28 = undefined;
-        $interval.cancel(promise29);
-        promise29 = undefined;
+        // if (angular.isDefined(promise26)) {
+        //     $interval.cancel(promise26);
+        //     promise26 = undefined;
+        // }
+        // if (angular.isDefined(promise28)) {
+        //     $interval.cancel(promise28);
+        //     promise28 = undefined;
+        // }
+        // if (angular.isDefined(promise29)) {
+        //     $interval.cancel(promise29);
+        //     promise29 = undefined;
+        // }
+        // $interval.cancel(promise26);
+        // promise26 = undefined;
+        // $interval.cancel(promise28);
+        // promise28 = undefined;
+        // $interval.cancel(promise29);
+        // promise29 = undefined;
 
-        repeat27 = function(){
+        function repeat27(){
             var msg= CHARIOT+SOURCE+7+DEST+SENSOR;
             console.log(msg);
+            console.log('isDefined27: '+angular.isDefined(promise27));
+            console.log('promise27: '+promise27);
             connection.send(msg);
             i++;
         }
@@ -147,22 +316,41 @@ angular.module('smartapp').controller('coapCtrl', function ($state, $stateParams
         { 
             repeat27();
         }, 
-        10000);  
+        20000);  
         console.log(promise27);
     }
 
     $scope.chariot28 = function(){
+        promises();
+        dis26 = false;
+        dis27 = false;
+        dis28 = true;
+        dis29 = false;
         i = 0;
-        $interval.cancel(promise27);
-        promise27 = undefined;
-        $interval.cancel(promise26);
-        promise26 = undefined;
-        $interval.cancel(promise29);
-        promise29 = undefined;
+        // if (angular.isDefined(promise27)) {
+        //     $interval.cancel(promise27);
+        //     promise27 = undefined;
+        // }
+        // if (angular.isDefined(promise26)) {
+        //     $interval.cancel(promise26);
+        //     promise26 = undefined;
+        // }
+        // if (angular.isDefined(promise29)) {
+        //     $interval.cancel(promise29);
+        //     promise29 = undefined;
+        // }
+        // $interval.cancel(promise27);
+        // promise27 = undefined;
+        // $interval.cancel(promise26);
+        // promise26 = undefined;
+        // $interval.cancel(promise29);
+        // promise29 = undefined;
 
-        repeat28 = function(){
+        function repeat28(){
             var msg= CHARIOT+SOURCE+8+DEST+SENSOR;
             console.log(msg);
+            console.log('isDefined28: '+angular.isDefined(promise28));
+            console.log('promise28: '+promise28);
             connection.send(msg);
             i++;
         }
@@ -171,22 +359,41 @@ angular.module('smartapp').controller('coapCtrl', function ($state, $stateParams
         { 
             repeat28();
         }, 
-        10000);
+        20000);
         console.log(promise28);
     }
 
     $scope.chariot29 = function(){
+        promises();
+        dis26 = false;
+        dis27 = false;
+        dis28 = false;
+        dis29 = true;
         i = 0;
-        $interval.cancel(promise27);
-        promise27 = undefined;
-        $interval.cancel(promise28);
-        promise28 = undefined;
-        $interval.cancel(promise26);
-        promise26 = undefined;
+        // if (angular.isDefined(promise27)) {
+        //     $interval.cancel(promise27);
+        //     promise27 = undefined;
+        // }
+        // if (angular.isDefined(promise28)) {
+        //     $interval.cancel(promise28);
+        //     promise28 = undefined;
+        // }
+        // if (angular.isDefined(promise26)) {
+        //     $interval.cancel(promise26);
+        //     promise26 = undefined;
+        // }
+        // $interval.cancel(promise27);
+        // promise27 = undefined;
+        // $interval.cancel(promise28);
+        // promise28 = undefined;
+        // $interval.cancel(promise26);
+        // promise26 = undefined;
 
-        repeat29 = function(){
+        function repeat29(){
             var msg= CHARIOT+SOURCE+9+DEST+SENSOR;
             console.log(msg);
+            console.log('isDefined29: '+angular.isDefined(promise29));
+            console.log('promise29: '+promise29);
             connection.send(msg);
             i++;
         }
@@ -195,10 +402,56 @@ angular.module('smartapp').controller('coapCtrl', function ($state, $stateParams
         { 
             repeat29();
         }, 
-        10000);
+        20000);
         console.log(promise29);
     }
 
+    $scope.sound28_on = function(){
+        i=0;
+        promises();
+        var msg='coap://chariot.c3528.local/arduino/digital?put&pin=13&val=1';
+        console.log(msg);
+        connection.send(msg);
+    }
+
+    $scope.sound28_off = function(){
+        i=0;
+        promises();
+        var msg='coap://chariot.c3528.local/arduino/digital?put&pin=13&val=0';
+        console.log(msg);
+        connection.send(msg);
+    }
+
+    $scope.light28_on = function(){
+        i=0;
+        promises();
+        var msg='coap://chariot.c3528.local/arduino/digital?put&pin=10&val=1';
+        console.log(msg);
+        connection.send(msg);
+    }
+
+    $scope.light28_off = function(){
+        i=0;
+        promises();
+        var msg='coap://chariot.c3528.local/arduino/digital?put&pin=10&val=0';
+        console.log(msg);
+        connection.send(msg);
+    }
+
+    function read_light_state(){
+        i=0;
+        promises();
+        var msg='coap://chariot.c3528.local/arduino/digital?get&pin=10';
+        console.log(msg);
+        connection.send(msg);
+    }
+
+    function read_sound_state(){
+        promises();
+        var msg='coap://chariot.c3528.local/arduino/digital?get&pin=6';
+        console.log(msg);
+        connection.send(msg);
+    }
 
     /**
      * This method is optional. If the server wasn't able to respond to the
@@ -211,7 +464,15 @@ angular.module('smartapp').controller('coapCtrl', function ($state, $stateParams
             var status = 'Error ' 
                         + 'Unable to communicate ' 
                         + 'with the WebSocket server.';
-            $scope.status = status;
+            $scope.$apply(function(){
+                $scope.status = status;
+                $scope.result = 'Restart server manually';
+                $scope.location = 'Location: --';
+                $scope.contador = ' Lap number: -- ';
+                $scope.tiempo = ' Response time: --';
+                $scope.place = ' Place: --';
+                console.log('Error. status error 3');
+            });  
         }
-    }, 60000);
+    }, 50000);
 });

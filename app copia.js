@@ -1,7 +1,7 @@
 /**
  * Created by raul on 5/12/16.
  */
-// process.env.TZ = 'UTC+2';
+
 var chariot         = 'ws://192.168.0.195:1337';
 
 var tiempo;
@@ -9,6 +9,11 @@ var location;
 var resp;
 var result;
 var place;
+
+var c26             = 0;
+var c27             = 0;
+var c28             = 0;
+var c29             = 0;
 
 const MIRE          = 'Mire\'s bedroom';
 const RAUL          = 'Raul\'s bedroom';
@@ -18,7 +23,6 @@ const CHARIOT       = 'coap://chariot.';
 const SOURCE        = 'c352';
 const DEST          = '.local/';
 const SENSOR        = 'sensors/tmp275-c?get';
-const MAX_SENDS     = 8;
 
 var app             = require("express")();
 var express         = require("express"),// Express: Framework HTTP para Node.js
@@ -40,15 +44,6 @@ var WebSocketClient = require('websocket').client;
     serialport      = require('serialport');
 var sleep           = require('sleep');
 var Temp            = require('./models/temp.js');
-var moment          = require('moment-timezone');
-
-moment().tz("Europe/Madrid").format();
-
-var c26 = 0;
-var c27 = 0;
-var c28 = 0;
-var c29 = 0;
-var countSend = 0;
 
 var allowCrossDomain = function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -80,7 +75,6 @@ mongoose.connect('mongodb://localhost/sensors', function(err, res) {
 var server = require('http').Server(app);
 
 function start(){
-    console.log('send0:',countSend);
     var client = new WebSocketClient();
     client.connect(chariot);
      
@@ -105,8 +99,6 @@ function start(){
             console.log('');
         });
         connection.on('message', function(message) {
-            countSend++;
-            console.log('countSend1:',countSend);
             if (message.type === 'utf8') {
                 console.log('');
                 console.log("Received:",message.utf8Data);
@@ -156,31 +148,18 @@ function start(){
                 //connection.close();
             }
             //sleep.sleep(1);
-            if (countSend == MAX_SENDS){
+            closeWS();
+        });
+        function closeWS() {
+            if ((c26 == 1)&&(c27 == 1)&&(c28 == 1)&&(c29 == 1)){
                 console.log('Closing WebSocket Client...');
                 c26 = 0;
                 c27 = 0;
                 c28 = 0;
                 c29 = 0;
-                countSend = 0;
-                console.log('countSendClose:',countSend);
                 connection.close();
-                // closeWS();
             }
-        });
-        // function closeWS() {
-        //     // if ((c26*c27*c28*c29)==1){
-        //     if (countSend == MAX_SENDS){
-        //         console.log('Closing WebSocket Client...');
-        //         c26 = 0;
-        //         c27 = 0;
-        //         c28 = 0;
-        //         c29 = 0;
-        //         countSend = 0;
-        //         console.log('countSendClose:',countSend);
-        //         connection.close();
-        //     }
-        // }
+        }
         function sendTemp26() {
             if (connection.connected) {
                 var msg26 = CHARIOT+SOURCE+6+DEST+SENSOR;
@@ -241,7 +220,7 @@ function start(){
 
 start();
 
-setInterval(start, 150000);
+setInterval(start, 600000);
 //setTimeout(start, 10000);
 
 /** End WebSocket Client **/

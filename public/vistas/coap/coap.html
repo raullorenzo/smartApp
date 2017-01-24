@@ -1,26 +1,36 @@
 <div style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
     <h1 style="font-size: 60px;">TEMPERATURE SENSOR:</h1>
     <br><br>
-    <button type="button" class="btn btn-primary" ng-click="return()">VOLVER</button>
-    <button type="button" class="btn btn-danger" ng-click="exit()">SALIR</button>
-    <button type="button" class="btn btn-success" ng-click="reload()">RELOAD</button>
+    <button type="button" class="btn btn-success" ng-click="return()"><span class="glyphicon glyphicon-home"></span>&nbsp;&nbsp;VOLVER</button>
+    <button type="button" class="btn btn-danger" ng-click="exit()"><span class="glyphicon glyphicon-off"></span>&nbsp;&nbsp;SALIR</button>
+    <button style="float: right;" type="button" class="btn btn-primary" ng-click="reload()"><span class="glyphicon glyphicon-refresh"></span></button>
     <hr>
     <br>
-    <button type="button" class="btn btn-primary" ng-click="chariot26()">Temperatura 3526</button>
-    <button type="button" class="btn btn-success" ng-click="chariot27()">Temperatura 3527</button>
-    <button type="button" class="btn btn-info" ng-click="chariot28()">Temperatura 3528</button>
-    <button type="button" class="btn btn-warning" ng-click="chariot29()">Temperatura 3529</button>
+    <button ng-disabled="dis26" type="button" class="btn btn-primary" ng-click="chariot26()"><span class="glyphicon glyphicon-align-left"></span>&nbsp;&nbsp;Chariot 3526</button>
+    <button type="button" class="btn btn-success" ng-click="chariot27()"><span class="glyphicon glyphicon-align-left"></span>&nbsp;&nbsp;Chariot 3527</button>
+    <button type="button" class="btn btn-info" ng-click="chariot28()"><span class="glyphicon glyphicon-align-left"></span>&nbsp;&nbsp;Chariot 3528</button>
+    <button type="button" class="btn btn-warning" ng-click="chariot29()"><span class="glyphicon glyphicon-align-left"></span>&nbsp;&nbsp;Chariot 3529</button>
+    <button style="float: right;" type="button" class="btn btn-info" ng-click="desconnection()"><span class="glyphicon glyphicon-refresh"></span></button>
     <hr>
     <div>
-        <span style="color: green">{{status}}</span>
+        <span style="color: green" ng-bind="status"></span>
+        <button style="float: right;" type="button" class="btn btn-danger" ng-click="stop_reload()"><span class="glyphicon glyphicon-refresh"></span></button>
     </div>
     <hr>
     <div>
-        <span style="color: grey">{{location}} {{tiempo}} {{contador}}</span>
+        <span style="color: grey">{{location}} {{tiempo}} {{contador}} {{place}}</span>
     </div>
     <hr>
     <br>
-    <div style="font-size: 70px; color: red">{{result}}</div>
+    <div style="font-size: 70px; color: red" ng-bind="result"></div>
+    <hr>
+    <br>
+    <br>
+    <button type="button" class="btn btn-success" ng-click="sound28_on()"><span class="glyphicon glyphicon-bullhorn"></span>&nbsp;&nbsp;Sound 3528 ON</button>
+    <button type="button" class="btn btn-danger" ng-click="sound28_off()"><span class="glyphicon glyphicon-volume-off"></span>&nbsp;&nbsp;Sound 3528 OFF</button>
+    <button type="button" class="btn btn-success" ng-click="light28_on()"><span class="glyphicon glyphicon-lamp"></span>&nbsp;&nbsp;Light 3528 ON</button>
+    <button type="button" class="btn btn-danger" ng-click="light28_off()"><span class="glyphicon glyphicon-ban-circle"></span>&nbsp;&nbsp;Light 3528 OFF</button>
+    <hr>
     <br>
     <br>
     <br>
